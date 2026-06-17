@@ -199,6 +199,9 @@ export const translations: Record<Lang, Dict> = {
         'pt.confirmCloseTitle': 'Close position?',
         'pt.confirmClose': 'Close your {sym} position at market?',
         'pt.tpslLocal': 'TP/SL is monitored by the app and closes at market when hit — active only while this tab is open.',
+        'pt.opened': 'Opened',
+        'pt.ago': '{d} ago',
+        'pt.justNow': 'just now',
         // API keys modal
         'keys.title': 'Binance API keys',
         'keys.warning':
@@ -445,6 +448,9 @@ export const translations: Record<Lang, Dict> = {
         'pt.confirmCloseTitle': '¿Cerrar posición?',
         'pt.confirmClose': '¿Cerrar tu posición de {sym} a mercado?',
         'pt.tpslLocal': 'El TP/SL lo monitorea la app y cierra a mercado al alcanzarse — activo solo mientras esta pestaña esté abierta.',
+        'pt.opened': 'Abierta',
+        'pt.ago': 'hace {d}',
+        'pt.justNow': 'recién',
         // API keys modal
         'keys.title': 'Claves API de Binance',
         'keys.warning':

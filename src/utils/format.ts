@@ -41,6 +41,28 @@ export const formatNumber = (value: number, digits = 2): string => {
     return value.toFixed(digits)
 }
 
+/** Opened day + hour, localized — e.g. "Jun 17, 14:32". */
+export const formatOpenedAt = (ts: number, locale = 'en-US'): string => {
+    if (!ts || Number.isNaN(ts)) return '—'
+    return new Date(ts).toLocaleString(locale, {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+    })
+}
+
+/** Compact elapsed duration since `ms` milliseconds ago — e.g. "5m", "2h", "3d". */
+export const formatAgo = (ms: number): string => {
+    const s = Math.max(0, Math.floor(ms / 1000))
+    const m = Math.floor(s / 60)
+    if (m < 60) return `${Math.max(1, m)}m`
+    const h = Math.floor(m / 60)
+    if (h < 24) return `${h}h`
+    return `${Math.floor(h / 24)}d`
+}
+
 /** USD/USDT amount with thousands separators, e.g. 10000 → "10,000.00". */
 export const formatUsd = (value: number, digits = 2): string => {
     if (Number.isNaN(value)) return '—'

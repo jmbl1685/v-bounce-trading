@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
+import type { Interval } from '../types'
 
 export type Side = 'LONG' | 'SHORT'
 export type FeeMode = 'taker' | 'maker'
@@ -17,6 +18,8 @@ export interface Position {
     qty: number
     decimals: number
     openedAt: number
+    /** Timeframe the signal/position was opened on (e.g. '15m'). */
+    interval?: Interval
     /** Fee rate locked in at open (so close uses the same rate). */
     feeRate: number
     /** Fee paid when the position was opened. */
@@ -99,7 +102,7 @@ interface PaperTradingValue {
     closed: ClosedTrade[]
     defaults: Defaults
     startBalance: number
-    open: (args: { symbol: string; base: string; side: Side; price: number; decimals: number }) => boolean
+    open: (args: { symbol: string; base: string; side: Side; price: number; decimals: number; interval: Interval }) => boolean
     close: (id: string, price: number, reason?: CloseReason) => void
     setTpSl: (id: string, tp: number | null, sl: number | null) => void
     setDefaults: (d: Partial<Defaults>) => void
@@ -165,7 +168,7 @@ export const PaperTradingProvider = ({ children }: { children: ReactNode }) => {
     }, [account, positions, closed, defaults, startBalance])
 
     const open: PaperTradingValue['open'] = useCallback(
-        ({ symbol, base, side, price, decimals }) => {
+        ({ symbol, base, side, price, decimals, interval }) => {
             if (!(price > 0)) return false
             const { margin, leverage } = defaults
             const feeRate = feeRateOf(defaults.feeMode, defaults.bnb)
@@ -174,7 +177,7 @@ export const PaperTradingProvider = ({ children }: { children: ReactNode }) => {
             const qty = (margin * leverage) / price
             setAccount((a) => ({ balance: a.balance - margin - openFee, realized: a.realized - openFee }))
             setPositions((ps) => [
-                { id: newId(), symbol, base, side, entryPrice: price, margin, leverage, qty, decimals, openedAt: Date.now(), feeRate, openFee, tp: null, sl: null },
+                { id: newId(), symbol, base, side, entryPrice: price, margin, leverage, qty, decimals, openedAt: Date.now(), interval, feeRate, openFee, tp: null, sl: null },
                 ...ps
             ])
             return true

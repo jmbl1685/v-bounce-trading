@@ -20,7 +20,7 @@ import { getLocalTpSl, setLocalTpSl, clearLocalTpSl, localTpSlSymbols } from '..
 import { AssetLogo } from '../AssetLogo/AssetLogo'
 import { CredentialsModal } from '../CredentialsModal/CredentialsModal'
 import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog'
-import { formatPrice, formatUsd } from '../../utils/format'
+import { formatPrice, formatUsd, formatOpenedAt, formatAgo } from '../../utils/format'
 import './PositionsPanel.scss'
 
 interface PositionsPanelProps {
@@ -322,9 +322,13 @@ const DemoRow = ({
     close: (id: string, price: number) => void
     t: (k: string, v?: Record<string, string | number>) => string
 }) => {
+    const { lang } = useI18n()
     const { p, price, net, roe, liq, fees, funding } = row
     const [tp, setTp] = useState(p.tp != null ? String(p.tp) : '')
     const [sl, setSl] = useState(p.sl != null ? String(p.sl) : '')
+
+    const elapsed = now - p.openedAt
+    const ago = elapsed < 60_000 ? t('pt.justNow') : t('pt.ago', { d: formatAgo(elapsed) })
 
     // Commit only when the user clicks Set — typing must never arm the exit, or
     // a partial value (e.g. "1") would look "hit" and auto-close the position.
@@ -362,6 +366,12 @@ const DemoRow = ({
             </div>
             <div className='positions-panel__costs'>
                 {t('pt.fees')} <b>-{formatUsd(fees, 2)}</b> · {t('pt.funding')} <b>{usdt(-funding)}</b>
+            </div>
+            <div className='positions-panel__opened'>
+                <span>
+                    🕒 {t('pt.opened')} {formatOpenedAt(p.openedAt, lang)} · {ago}
+                </span>
+                {p.interval && <span className='positions-panel__tf'>{p.interval}</span>}
             </div>
             <div className='positions-panel__tpsl'>
                 <label>

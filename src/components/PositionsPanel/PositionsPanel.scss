@@ -544,6 +544,26 @@
         }
     }
 
+    &__opened {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: $space-2;
+        font-size: 10px;
+        color: var(--text-faint);
+    }
+
+    &__tf {
+        flex: none;
+        padding: 1px 7px;
+        font-family: $font-mono;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--accent);
+        background: var(--accent-soft);
+        border-radius: 999px;
+    }
+
     &__tpsl {
         display: grid;
         grid-template-columns: 1fr 1fr;

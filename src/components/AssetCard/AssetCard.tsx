@@ -113,7 +113,7 @@ export const AssetCard = ({ symbol, interval, onRemove }: AssetCardProps) => {
             }
             return
         }
-        openPosition({ symbol, base: base(symbol), side, price, decimals: priceDecimals ?? 2 })
+        openPosition({ symbol, base: base(symbol), side, price, decimals: priceDecimals ?? 2, interval })
     }
 
     // Place the real order from the confirm modal, then report via a banner toast.
