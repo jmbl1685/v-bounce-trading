@@ -1,0 +1,455 @@
+@use '../../styles/variables' as *;
+
+.asset-card {
+    @include card;
+    position: relative;
+    padding: $space-4;
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+    overflow: hidden;
+    animation: fade-up 0.35s ease both;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 3px;
+        background: var(--border);
+        transition: background 0.3s ease;
+    }
+
+    &--long::before {
+        background: linear-gradient(90deg, var(--long), var(--cyan));
+    }
+    &--short::before {
+        background: linear-gradient(90deg, var(--short), var(--wait));
+    }
+    &--wait::before {
+        background: linear-gradient(90deg, var(--wait), var(--border-strong));
+    }
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: $shadow-pop;
+        border-color: var(--border-strong);
+    }
+
+    // ---- header --------------------------------------------------------------
+    &__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    &__id {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+    }
+
+    &__head-right {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+    }
+
+    &__symbol {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+    }
+
+    &__quote {
+        color: var(--text-faint);
+        font-weight: 500;
+        font-size: 13px;
+        margin-left: 2px;
+    }
+
+    &__tf {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-dim);
+        background: var(--surface-3);
+        padding: 3px 8px;
+        border-radius: 999px;
+    }
+
+    &__binance,
+    &__remove {
+        width: 28px;
+        height: 28px;
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+        color: var(--text-faint);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        transition: all 0.16s ease;
+    }
+
+    &__binance {
+        font-size: 14px;
+        text-decoration: none;
+
+        &:hover {
+            color: #f0b90b; // Binance brand gold
+            border-color: #f0b90b;
+            transform: translateY(-1px);
+        }
+    }
+
+    &__remove:hover {
+        color: var(--short);
+        border-color: var(--short);
+    }
+
+    // ---- price ---------------------------------------------------------------
+    &__price-row {
+        display: flex;
+        align-items: baseline;
+        gap: $space-3;
+    }
+
+    &__price {
+        font-family: $font-mono;
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+
+    &__change {
+        font-size: 14px;
+        font-weight: 600;
+        font-family: $font-mono;
+
+        &--up {
+            color: var(--long);
+        }
+        &--down {
+            color: var(--short);
+        }
+        &--flat {
+            color: var(--text-dim);
+        }
+    }
+
+    &__spark {
+        margin: -4px 0;
+    }
+
+    &__loading {
+        padding: $space-5 0;
+        text-align: center;
+        color: var(--text-dim);
+        font-size: 13px;
+
+        &--error {
+            color: var(--short);
+        }
+    }
+
+    // ---- signal --------------------------------------------------------------
+    &__signal {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: $space-3;
+        border-radius: $radius-md;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+    }
+
+    &__signal-left {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+    }
+
+    &__pattern {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-dim);
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        padding: 3px 9px;
+        border-radius: 999px;
+
+        &.is-fake {
+            color: var(--wait);
+            background: var(--wait-soft);
+            border-color: var(--wait-soft);
+        }
+    }
+
+    &__fake {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--wait);
+        background: var(--wait-soft);
+        border: 1px solid var(--wait-soft);
+        border-radius: $radius-md;
+        padding: $space-2 $space-3;
+    }
+
+    &__trend {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+    }
+
+    &__trend-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-faint);
+    }
+
+    &__trend-val {
+        font-size: 13px;
+        font-weight: 600;
+
+        &.is-up {
+            color: var(--long);
+        }
+        &.is-down {
+            color: var(--short);
+        }
+        &.is-range {
+            color: var(--text-dim);
+        }
+    }
+
+    // ---- levels --------------------------------------------------------------
+    &__levels {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: $space-2;
+    }
+
+    &__level {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: $space-2 $space-3;
+        border-radius: $radius-md;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+
+        span {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-faint);
+        }
+        b {
+            font-family: $font-mono;
+            font-size: 14px;
+        }
+
+        &--res b {
+            color: var(--short);
+        }
+        &--sup b {
+            color: var(--long);
+        }
+    }
+
+    // ---- trade plan ----------------------------------------------------------
+    &__plan {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    &__plan-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: $space-2;
+    }
+
+    &__plan-basis {
+        font-size: 11px;
+        color: var(--text-faint);
+    }
+
+    &__rr {
+        font-size: 11px;
+        font-weight: 700;
+        font-family: $font-mono;
+        padding: 2px 8px;
+        border-radius: 999px;
+        color: var(--text-dim);
+        background: var(--surface-3);
+
+        &.is-good {
+            color: var(--long);
+            background: var(--long-soft);
+        }
+        &.is-poor {
+            color: var(--short);
+            background: var(--short-soft);
+        }
+    }
+
+    &__trade {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: $space-2;
+        padding: $space-3;
+        border-radius: $radius-md;
+        background: var(--accent-soft);
+        border: 1px dashed var(--accent);
+    }
+
+    &__trade-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        text-align: center;
+
+        span {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-dim);
+        }
+        b {
+            font-family: $font-mono;
+            font-size: 13px;
+        }
+        &.is-loss b {
+            color: var(--short);
+        }
+        &.is-profit b {
+            color: var(--long);
+        }
+    }
+
+    // ---- reasons -------------------------------------------------------------
+    &__reasons {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    &__reason {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+        font-size: 12px;
+        color: var(--text-dim);
+    }
+
+    &__reason-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        background: var(--text-faint);
+    }
+
+    &__reason.is-bull &__reason-dot {
+        background: var(--long);
+    }
+    &__reason.is-bear &__reason-dot {
+        background: var(--short);
+    }
+
+    // ---- paper trade ---------------------------------------------------------
+    &__paper {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    &__paper-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-faint);
+        font-weight: 600;
+    }
+
+    &__paper.is-real &__paper-label {
+        color: var(--real);
+    }
+
+    &__paper-btns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: $space-2;
+    }
+
+    &__paper-btn {
+        padding: 9px;
+        font-size: 13px;
+        font-weight: 700;
+        border-radius: $radius-md;
+        border: 1px solid transparent;
+        transition: all 0.16s ease;
+
+        &.is-long {
+            color: var(--long);
+            background: var(--long-soft);
+            &:hover {
+                background: var(--long);
+                color: #fff;
+            }
+        }
+        &.is-short {
+            color: var(--short);
+            background: var(--short-soft);
+            &:hover {
+                background: var(--short);
+                color: #fff;
+            }
+        }
+    }
+
+    // ---- backtest button -----------------------------------------------------
+    &__backtest {
+        margin-top: 2px;
+        padding: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-dim);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: $radius-md;
+        transition: all 0.16s ease;
+
+        &:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+    }
+
+    &__tuned {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--cyan);
+        background: var(--surface-3);
+        padding: 2px 7px;
+        border-radius: 999px;
+    }
+}

@@ -1,0 +1,148 @@
+@use './styles/variables' as *;
+
+.app {
+    min-height: 100vh;
+    padding: $space-5 $space-4 $space-6;
+    transition: padding-right 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+
+    // Shift content left for the positions panel on wide screens.
+    @media (min-width: 1180px) {
+        &--panel {
+            padding-right: calc(330px + #{$space-4});
+        }
+    }
+
+    &__shell {
+        max-width: $bp-lg;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: $space-5;
+    }
+
+    &__panel-toggle {
+        position: fixed;
+        right: $space-4;
+        bottom: $space-4;
+        z-index: 35;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 16px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #fff;
+        background: var(--accent);
+        border: none;
+        border-radius: 999px;
+        box-shadow: $shadow-pop;
+        transition: transform 0.15s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+        }
+    }
+
+    &__panel-badge {
+        display: grid;
+        place-items: center;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--accent);
+        background: #fff;
+        border-radius: 999px;
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: $space-4;
+    }
+
+    &__empty {
+        @include card;
+        padding: $space-6 $space-4;
+        text-align: center;
+        color: var(--text-dim);
+
+        &-icon {
+            font-size: 40px;
+            margin-bottom: $space-2;
+        }
+
+        h2 {
+            margin: 0 0 $space-1;
+            color: var(--text);
+            font-size: 18px;
+        }
+
+        p {
+            margin: 0;
+            font-size: 14px;
+        }
+    }
+
+    &__footer {
+        text-align: center;
+        padding-top: $space-3;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: $space-3;
+
+        p {
+            margin: 0 auto;
+            max-width: 560px;
+            font-size: 12px;
+            color: var(--text-faint);
+            line-height: 1.6;
+        }
+    }
+
+    &__credit-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+    }
+
+    &__credit-note {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-faint);
+        letter-spacing: 0.01em;
+    }
+
+    &__credit {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-dim);
+        text-decoration: none;
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        transition: all 0.16s ease;
+
+        &:hover {
+            color: var(--text);
+            border-color: #d97757;
+        }
+    }
+}
+
+@media (max-width: $bp-sm) {
+    .app {
+        padding: $space-4 $space-3 $space-5;
+    }
+
+    .app__grid {
+        grid-template-columns: 1fr;
+    }
+}

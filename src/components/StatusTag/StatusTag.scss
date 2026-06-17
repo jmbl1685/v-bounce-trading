@@ -1,0 +1,66 @@
+@use '../../styles/variables' as *;
+
+.status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    white-space: nowrap;
+
+    &__dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        background: currentColor;
+
+        &.is-pulsing {
+            animation: pulse-ring 1.8s infinite;
+        }
+    }
+
+    &__attempt {
+        font-family: $font-mono;
+        opacity: 0.75;
+    }
+
+    // Colour per state — text colour drives the dot via currentColor.
+    &--live {
+        color: var(--long);
+        border-color: var(--long-soft);
+        background: var(--long-soft);
+        --pulse-color: var(--long-soft);
+    }
+
+    &--connecting {
+        color: var(--cyan);
+        border-color: var(--accent-soft);
+        background: var(--accent-soft);
+        --pulse-color: var(--accent-soft);
+    }
+
+    &--reconnecting {
+        color: var(--wait);
+        border-color: var(--wait-soft);
+        background: var(--wait-soft);
+        --pulse-color: var(--wait-soft);
+    }
+
+    &--offline {
+        color: var(--text-dim);
+        border-color: var(--border);
+        background: var(--surface-3);
+    }
+
+    &--error {
+        color: var(--short);
+        border-color: var(--short-soft);
+        background: var(--short-soft);
+    }
+}

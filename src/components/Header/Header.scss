@@ -1,0 +1,100 @@
+@use '../../styles/variables' as *;
+
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-4;
+    flex-wrap: wrap;
+
+    &__brand {
+        display: flex;
+        align-items: center;
+        gap: $space-3;
+    }
+
+    &__logo {
+        display: grid;
+        place-items: center;
+        filter: drop-shadow(0 4px 12px var(--accent-soft));
+    }
+
+    &__title {
+        h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+
+            span {
+                background: linear-gradient(90deg, var(--cyan), var(--accent));
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+        }
+
+        p {
+            margin: 2px 0 0;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+    }
+
+    &__right {
+        display: flex;
+        align-items: center;
+        gap: $space-4;
+    }
+
+    &__net {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 11px;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+
+        &-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        &.is-online {
+            color: var(--long);
+            background: var(--long-soft);
+            border-color: var(--long-soft);
+            --pulse-color: var(--long-soft);
+
+            .app-header__net-dot {
+                animation: pulse-ring 1.8s infinite;
+            }
+        }
+
+        &.is-offline {
+            color: var(--short);
+            background: var(--short-soft);
+            border-color: var(--short-soft);
+        }
+    }
+
+    &__count {
+        font-size: 13px;
+        color: var(--text-dim);
+
+        b {
+            color: var(--text);
+            font-weight: 700;
+        }
+    }
+}
+
+@media (max-width: $bp-sm) {
+    .app-header__net {
+        display: none;
+    }
+}

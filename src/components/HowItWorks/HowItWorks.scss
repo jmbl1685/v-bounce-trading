@@ -1,0 +1,135 @@
+@use '../../styles/variables' as *;
+
+.how {
+    @include card;
+    overflow: hidden;
+
+    &__head {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: $space-3;
+        padding: $space-4;
+        background: none;
+        border: none;
+        color: var(--text);
+        text-align: left;
+    }
+
+    &__title {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    &__icon {
+        font-size: 15px;
+    }
+
+    &__subtitle {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-faint);
+    }
+
+    &__chevron {
+        color: var(--text-dim);
+        font-size: 14px;
+        transition: transform 0.22s ease;
+    }
+
+    &.is-open &__chevron {
+        transform: rotate(180deg);
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        gap: $space-3;
+        padding: 0 $space-4 $space-4;
+        animation: fade-up 0.2s ease both;
+
+        p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.7;
+            color: var(--text-dim);
+        }
+
+        b {
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        i {
+            color: var(--text-dim);
+        }
+    }
+
+    &__section {
+        margin: $space-2 0 0;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--accent);
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    &__example {
+        align-self: flex-start;
+        padding: 8px 14px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--accent);
+        background: var(--accent-soft);
+        border: 1px solid var(--accent-soft);
+        border-radius: $radius-md;
+        transition: all 0.16s ease;
+
+        &:hover {
+            transform: translateY(-1px);
+            border-color: var(--accent);
+        }
+    }
+
+    &__list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: $space-2;
+
+        li {
+            position: relative;
+            padding-left: $space-4;
+            font-size: 13px;
+            line-height: 1.65;
+            color: var(--text-dim);
+
+            &::before {
+                content: '';
+                position: absolute;
+                left: 4px;
+                top: 9px;
+                width: 5px;
+                height: 5px;
+                border-radius: 50%;
+                background: var(--accent);
+            }
+        }
+    }
+}
+
+@media (max-width: $bp-sm) {
+    .how__subtitle {
+        display: none;
+    }
+}

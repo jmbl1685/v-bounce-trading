@@ -1,0 +1,30 @@
+@use '../../styles/variables' as *;
+
+.lang-toggle {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    border-radius: 999px;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+
+    &__btn {
+        padding: 5px 10px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        color: var(--text-dim);
+        background: none;
+        border: none;
+        border-radius: 999px;
+        transition: all 0.18s ease;
+
+        &:hover {
+            color: var(--text);
+        }
+        &.is-active {
+            color: #fff;
+            background: var(--accent);
+        }
+    }
+}

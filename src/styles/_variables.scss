@@ -1,0 +1,37 @@
+// Shared design tokens. Theme-specific colours live as CSS custom properties in
+// global.scss; this file holds structural tokens that don't change with theme.
+
+// ---- Cursor branding --------------------------------------------------------
+// Update this hex to recolour the whole site's custom cursor. It is exposed as
+// the --cursor-color CSS variable (see global.scss) and rasterised to a PNG
+// cursor at runtime (src/utils/cursors.ts), because Chromium does not support
+// SVG image cursors.
+$cursor-color: #7984EA;
+
+$radius-sm: 8px;
+$radius-md: 14px;
+$radius-lg: 22px;
+
+$space-1: 4px;
+$space-2: 8px;
+$space-3: 12px;
+$space-4: 16px;
+$space-5: 24px;
+$space-6: 32px;
+
+$font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+$font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+
+$shadow-card: 0 4px 24px rgba(0, 0, 0, 0.08);
+$shadow-pop: 0 12px 40px rgba(0, 0, 0, 0.18);
+
+$bp-sm: 640px;
+$bp-md: 960px;
+$bp-lg: 1280px;
+
+@mixin card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: $radius-lg;
+    box-shadow: $shadow-card;
+}

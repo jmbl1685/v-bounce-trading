@@ -1,0 +1,18 @@
+.sparkline {
+    width: 100%;
+    height: 44px;
+    display: block;
+
+    &--empty {
+        border-radius: 8px;
+        background: var(--surface-3);
+        opacity: 0.5;
+    }
+
+    &__level {
+        stroke-width: 1;
+        stroke-dasharray: 2 2;
+        opacity: 0.5;
+        vector-effect: non-scaling-stroke;
+    }
+}

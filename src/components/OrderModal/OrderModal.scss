@@ -1,0 +1,309 @@
+@use '../../styles/variables' as *;
+
+.om {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: grid;
+    place-items: center;
+    padding: $space-4;
+    background: rgba(4, 7, 14, 0.66);
+    backdrop-filter: blur(5px);
+    animation: fade-up 0.16s ease both;
+
+    &__panel {
+        position: relative;
+        width: 100%;
+        max-width: 392px;
+        @include card;
+        border-radius: $radius-lg;
+        padding: $space-5 $space-5 $space-4;
+        box-shadow: $shadow-pop;
+        text-align: center;
+        animation: om-pop 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        overflow: hidden;
+
+        // Accent ribbon along the top, tinted by trade side.
+        &::before {
+            content: '';
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 4px;
+            background: var(--accent);
+        }
+        &.om--long::before {
+            background: linear-gradient(90deg, var(--long), color-mix(in srgb, var(--long) 55%, var(--cyan)));
+        }
+        &.om--short::before {
+            background: linear-gradient(90deg, var(--short), color-mix(in srgb, var(--short) 60%, var(--wait)));
+        }
+        &.om--success::before {
+            background: var(--long);
+        }
+        &.om--error::before {
+            background: var(--short);
+        }
+    }
+
+    &__close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 28px;
+        height: 28px;
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+        color: var(--text-faint);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        transition: all 0.15s ease;
+
+        &:hover {
+            color: var(--short);
+            border-color: var(--short);
+        }
+    }
+
+    // ---- header icon disc -----------------------------------------------------
+    &__icon {
+        width: 56px;
+        height: 56px;
+        margin: $space-2 auto $space-3;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1;
+        border-radius: 50%;
+        color: #fff;
+
+        .om--long & {
+            background: color-mix(in srgb, var(--long) 18%, transparent);
+            color: var(--long);
+            box-shadow: 0 0 0 6px color-mix(in srgb, var(--long) 9%, transparent);
+        }
+        .om--short & {
+            background: color-mix(in srgb, var(--short) 18%, transparent);
+            color: var(--short);
+            box-shadow: 0 0 0 6px color-mix(in srgb, var(--short) 9%, transparent);
+        }
+
+        &--placing {
+            background: var(--surface-2) !important;
+            box-shadow: none !important;
+        }
+        &--success {
+            background: color-mix(in srgb, var(--long) 20%, transparent) !important;
+            color: var(--long) !important;
+            box-shadow: 0 0 0 6px color-mix(in srgb, var(--long) 10%, transparent) !important;
+            animation: om-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        &--error {
+            background: color-mix(in srgb, var(--short) 20%, transparent) !important;
+            color: var(--short) !important;
+            box-shadow: 0 0 0 6px color-mix(in srgb, var(--short) 10%, transparent) !important;
+        }
+    }
+
+    &__spinner {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        border: 3px solid var(--border);
+        border-top-color: var(--accent);
+        animation: om-spin 0.7s linear infinite;
+    }
+
+    &__title {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    &__sub {
+        margin: 6px auto 0;
+        max-width: 32ch;
+        font-size: 13px;
+        line-height: 1.55;
+        color: var(--text-dim);
+    }
+
+    // ---- detail grid ----------------------------------------------------------
+    &__grid {
+        margin: $space-4 0 0;
+        padding: $space-2 $space-3;
+        border-radius: $radius-md;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        text-align: left;
+    }
+
+    &__row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 7px 0;
+
+        & + & {
+            border-top: 1px solid var(--border);
+        }
+    }
+
+    &__k {
+        margin: 0;
+        font-size: 12px;
+        color: var(--text-faint);
+    }
+
+    &__v {
+        margin: 0;
+        font-family: $font-mono;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    &__pill {
+        padding: 2px 9px;
+        border-radius: 999px;
+        font-family: $font-sans;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+
+        &.is-long {
+            color: var(--long);
+            background: color-mix(in srgb, var(--long) 15%, transparent);
+        }
+        &.is-short {
+            color: var(--short);
+            background: color-mix(in srgb, var(--short) 15%, transparent);
+        }
+    }
+
+    &__badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 2px 10px;
+        border-radius: 999px;
+        font-family: $font-sans;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+
+        &::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        &.is-live {
+            color: var(--real);
+            background: color-mix(in srgb, var(--real) 14%, transparent);
+
+            &::before {
+                animation: om-pulse 1.3s ease-in-out infinite;
+            }
+        }
+        &.is-test {
+            color: var(--accent);
+            background: color-mix(in srgb, var(--accent) 14%, transparent);
+        }
+    }
+
+    &__error {
+        margin: $space-3 0 0;
+        padding: $space-3;
+        border-radius: $radius-md;
+        background: color-mix(in srgb, var(--short) 9%, var(--surface-2));
+        border: 1px solid color-mix(in srgb, var(--short) 30%, var(--border));
+        color: var(--short);
+        font-family: $font-mono;
+        font-size: 12px;
+        line-height: 1.5;
+        text-align: left;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    // ---- footer buttons -------------------------------------------------------
+    &__foot {
+        display: flex;
+        gap: $space-2;
+        margin-top: $space-4;
+    }
+
+    &__btn {
+        flex: 1;
+        padding: 11px 14px;
+        font-size: 14px;
+        font-weight: 700;
+        border-radius: $radius-md;
+        border: 1px solid transparent;
+        color: #fff;
+        transition:
+            transform 0.14s ease,
+            filter 0.14s ease,
+            opacity 0.14s ease;
+
+        &:hover:not(:disabled) {
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+        &:disabled {
+            opacity: 0.7;
+            cursor: progress;
+        }
+
+        &--ghost {
+            color: var(--text-dim);
+            background: var(--surface-2);
+            border-color: var(--border);
+
+            &:hover:not(:disabled) {
+                color: var(--text);
+            }
+        }
+        &--long {
+            background: var(--long);
+        }
+        &--short {
+            background: var(--short);
+        }
+        &--accent {
+            background: var(--accent);
+        }
+    }
+}
+
+@keyframes om-pop {
+    from {
+        opacity: 0;
+        transform: scale(0.94) translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes om-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes om-pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.3;
+    }
+}

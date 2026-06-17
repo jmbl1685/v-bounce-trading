@@ -1,0 +1,20 @@
+@use '../../styles/variables' as *;
+
+.asset-logo {
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--surface-3);
+    border: 2px solid var(--logo-ring);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+
+    &--mono {
+        color: #fff;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        line-height: 1;
+        font-family: $font-sans;
+    }
+}

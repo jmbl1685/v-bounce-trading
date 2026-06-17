@@ -1,0 +1,71 @@
+@use '../../styles/variables' as *;
+
+.horizon-tag {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: $space-3;
+    border-radius: $radius-md;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+
+    &__row {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+        flex-wrap: wrap;
+        font-size: 12px;
+        color: var(--text-dim);
+    }
+
+    &__style {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        padding: 3px 9px;
+        border-radius: 999px;
+
+        &--scalp {
+            color: var(--short);
+            background: var(--short-soft);
+        }
+        &--intraday {
+            color: var(--accent);
+            background: var(--accent-soft);
+        }
+        &--swing {
+            color: var(--cyan);
+            background: var(--surface-3);
+        }
+    }
+
+    &__hold b {
+        color: var(--text);
+        font-weight: 600;
+    }
+
+    &__close {
+        margin-left: auto;
+        font-variant-numeric: tabular-nums;
+
+        b {
+            font-family: $font-mono;
+            color: var(--text);
+        }
+    }
+
+    &__bar {
+        height: 4px;
+        border-radius: 999px;
+        background: var(--surface-3);
+        overflow: hidden;
+    }
+
+    &__bar-fill {
+        display: block;
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--accent), var(--cyan));
+        transition: width 0.9s linear;
+    }
+}

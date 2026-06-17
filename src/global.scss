@@ -1,0 +1,162 @@
+@use './styles/variables' as *;
+
+// ---- Theme tokens -----------------------------------------------------------
+:root {
+    --bg: #f4f6fb;
+    --bg-grad-a: #eef1fa;
+    --bg-grad-b: #f7f5ff;
+    --surface: #ffffff;
+    --surface-2: #f7f9fd;
+    --surface-3: #eef1f7;
+    --border: #e3e8f0;
+    --border-strong: #cfd6e4;
+    --text: #0f1729;
+    --text-dim: #5a6478;
+    --text-faint: #8a93a6;
+
+    --accent: #6366f1;
+    --accent-soft: rgba(99, 102, 241, 0.12);
+    --long: #10b981;
+    --long-soft: rgba(16, 185, 129, 0.14);
+    --short: #ef4444;
+    --short-soft: rgba(239, 68, 68, 0.14);
+    --wait: #f59e0b;
+    --wait-soft: rgba(245, 158, 11, 0.14);
+    --cyan: #06b6d4;
+
+    // Real/live trading accent — caution, deliberately NOT the loss-red.
+    --real: #f97316;
+    --real-soft: rgba(249, 115, 22, 0.14);
+
+    // Ring around asset logos so dark coin marks don't blend into the surface.
+    --logo-ring: rgba(15, 23, 41, 0.08);
+
+    // Branded cursor colour, rasterised to PNG cursors at runtime.
+    --cursor-color: #{$cursor-color};
+
+    color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+    --bg: #070a12;
+    --bg-grad-a: #0b1020;
+    --bg-grad-b: #0a0f1d;
+    --surface: #11151f;
+    --surface-2: #161b27;
+    --surface-3: #1c2230;
+    --border: #232a38;
+    --border-strong: #313a4d;
+    --text: #eef2fb;
+    --text-dim: #9aa6bd;
+    --text-faint: #66728a;
+
+    --accent: #818cf8;
+    --accent-soft: rgba(129, 140, 248, 0.16);
+    --long: #34d399;
+    --long-soft: rgba(52, 211, 153, 0.16);
+    --short: #f87171;
+    --short-soft: rgba(248, 113, 113, 0.16);
+    --wait: #fbbf24;
+    --wait-soft: rgba(251, 191, 36, 0.16);
+    --cyan: #22d3ee;
+
+    --real: #fb923c;
+    --real-soft: rgba(251, 146, 60, 0.18);
+
+    --logo-ring: rgba(255, 255, 255, 0.9);
+
+    color-scheme: dark;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    font-family: $font-sans;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+// Baseline cursors (keyword). At runtime these are upgraded to branded PNG
+// cursors by src/utils/cursors.ts; the keywords remain as a graceful fallback.
+a,
+button,
+summary,
+select,
+label[for],
+[role='button'],
+[role='tab'] {
+    cursor: pointer;
+}
+
+input[type='text'],
+input:not([type]),
+textarea {
+    cursor: text;
+}
+
+button:disabled {
+    cursor: not-allowed;
+}
+
+#root {
+    background:
+        radial-gradient(1200px 600px at 12% -10%, var(--bg-grad-a), transparent 60%),
+        radial-gradient(1000px 700px at 100% 0%, var(--bg-grad-b), transparent 55%),
+        var(--bg);
+    min-height: 100%;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+input {
+    font-family: inherit;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+@keyframes pulse-ring {
+    0% {
+        box-shadow: 0 0 0 0 var(--pulse-color, var(--long-soft));
+    }
+    70% {
+        box-shadow: 0 0 0 8px transparent;
+    }
+    100% {
+        box-shadow: 0 0 0 0 transparent;
+    }
+}
+
+@keyframes fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

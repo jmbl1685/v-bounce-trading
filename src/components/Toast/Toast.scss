@@ -1,0 +1,151 @@
+@use '../../styles/variables' as *;
+
+.toast {
+    position: fixed;
+    top: $space-4;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    width: calc(100vw - #{$space-4} * 2);
+    max-width: 400px;
+    pointer-events: none;
+
+    &__item {
+        position: relative;
+        pointer-events: auto;
+        display: flex;
+        align-items: flex-start;
+        gap: $space-3;
+        padding: 13px 14px;
+        overflow: hidden;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-left-width: 4px;
+        border-radius: $radius-md;
+        box-shadow: $shadow-pop;
+        animation: toast-in 0.34s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+        &--success {
+            border-left-color: var(--long);
+        }
+        &--error {
+            border-left-color: var(--short);
+        }
+        &--info {
+            border-left-color: var(--accent);
+        }
+    }
+
+    &__icon {
+        flex: none;
+        width: 24px;
+        height: 24px;
+        margin-top: 1px;
+        display: grid;
+        place-items: center;
+        font-size: 13px;
+        font-weight: 800;
+        line-height: 1;
+        border-radius: 50%;
+        color: #fff;
+
+        .toast__item--success & {
+            background: var(--long);
+        }
+        .toast__item--error & {
+            background: var(--short);
+        }
+        .toast__item--info & {
+            background: var(--accent);
+        }
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+        flex: 1;
+    }
+
+    &__title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    &__msg {
+        font-size: 12.5px;
+        line-height: 1.45;
+        color: var(--text-dim);
+        word-break: break-word;
+    }
+
+    &__close {
+        flex: none;
+        width: 22px;
+        height: 22px;
+        display: grid;
+        place-items: center;
+        font-size: 11px;
+        color: var(--text-faint);
+        background: transparent;
+        border: none;
+        border-radius: 6px;
+        transition: color 0.15s ease;
+
+        &:hover {
+            color: var(--text);
+        }
+    }
+
+    // Depleting progress bar that mirrors the auto-dismiss timer.
+    &__bar {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 2px;
+        width: 100%;
+        transform-origin: left;
+        animation: toast-bar linear forwards;
+
+        .toast__item--success & {
+            background: var(--long);
+        }
+        .toast__item--error & {
+            background: var(--short);
+        }
+        .toast__item--info & {
+            background: var(--accent);
+        }
+    }
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(-14px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes toast-bar {
+    from {
+        transform: scaleX(1);
+    }
+    to {
+        transform: scaleX(0);
+    }
+}
+
+@media (max-width: $bp-sm) {
+    .toast {
+        top: $space-3;
+    }
+}

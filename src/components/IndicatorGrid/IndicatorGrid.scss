@@ -1,0 +1,69 @@
+@use '../../styles/variables' as *;
+
+.indicator-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $space-2;
+
+    &__cell {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: $space-3;
+        border-radius: $radius-md;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+    }
+
+    &__key {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-faint);
+        font-weight: 600;
+    }
+
+    &__val {
+        font-family: $font-mono;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text);
+
+        &.is-bull {
+            color: var(--long);
+        }
+        &.is-bear {
+            color: var(--short);
+        }
+        &.is-bullish {
+            color: var(--long);
+        }
+        &.is-bearish {
+            color: var(--short);
+        }
+        &.is-neutral {
+            color: var(--text-dim);
+        }
+    }
+
+    &__sub {
+        font-size: 10px;
+        color: var(--text-dim);
+    }
+
+    &__bar {
+        margin-top: 4px;
+        height: 4px;
+        border-radius: 999px;
+        background: var(--surface-3);
+        overflow: hidden;
+    }
+
+    &__bar-fill {
+        display: block;
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--long), var(--wait) 55%, var(--short));
+        transition: width 0.4s ease;
+    }
+}
