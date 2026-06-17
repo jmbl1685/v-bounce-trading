@@ -385,6 +385,24 @@
             font-size: 13px;
         }
 
+        &-override {
+            flex: none;
+            margin-left: auto;
+            padding: 4px 10px;
+            font-size: 10px;
+            font-weight: 700;
+            white-space: nowrap;
+            color: #fff;
+            background: var(--short);
+            border: none;
+            border-radius: 999px;
+            transition: filter 0.15s ease;
+
+            &:hover {
+                filter: brightness(1.08);
+            }
+        }
+
         &--pass {
             color: var(--long);
             background: var(--long-soft);
@@ -432,6 +450,13 @@
         border-radius: $radius-md;
         border: 1px solid transparent;
         transition: all 0.16s ease;
+
+        &:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            filter: grayscale(0.4);
+            pointer-events: none;
+        }
 
         &.is-long {
             color: var(--long);

@@ -60,6 +60,7 @@ export const AssetCard = ({ symbol, interval, onRemove }: AssetCardProps) => {
     } = asset
 
     const [showBacktest, setShowBacktest] = useState(false)
+    const [btOverride, setBtOverride] = useState(false)
     const [order, setOrder] = useState<{
         side: 'LONG' | 'SHORT'
         plan: OrderPlan | null
@@ -93,6 +94,9 @@ export const AssetCard = ({ symbol, interval, onRemove }: AssetCardProps) => {
           : backtest.totalR > 0 && backtest.profitFactor >= 1
             ? ({ kind: 'pass', r: backtest.totalR, win: backtest.winRate, pf: backtest.profitFactor } as const)
             : ({ kind: 'fail', r: backtest.totalR, win: backtest.winRate, pf: backtest.profitFactor } as const)
+
+    // Hard gate: a failing backtest blocks the trade buttons until overridden.
+    const btBlocked = btVerdict?.kind === 'fail' && !btOverride
 
     // Feed the live price to the shared store so the positions panel can mark PnL.
     useEffect(() => {
@@ -332,6 +336,11 @@ export const AssetCard = ({ symbol, interval, onRemove }: AssetCardProps) => {
                                             pf: btVerdict.pf.toFixed(2)
                                         })}
                             </span>
+                            {btVerdict.kind === 'fail' && !btOverride && (
+                                <button className='asset-card__bt-override' onClick={() => setBtOverride(true)}>
+                                    {t('card.btTradeAnyway')}
+                                </button>
+                            )}
                         </div>
                     )}
 
@@ -340,10 +349,10 @@ export const AssetCard = ({ symbol, interval, onRemove }: AssetCardProps) => {
                             {realMode ? `⚡ ${t('card.real')}` : t('card.paper')} · {defaults.margin} USDT · {defaults.leverage}x
                         </span>
                         <div className='asset-card__paper-btns'>
-                            <button className='asset-card__paper-btn is-long' onClick={() => openTrade('LONG')}>
+                            <button className='asset-card__paper-btn is-long' onClick={() => openTrade('LONG')} disabled={btBlocked}>
                                 ▲ {t('card.long')}
                             </button>
-                            <button className='asset-card__paper-btn is-short' onClick={() => openTrade('SHORT')}>
+                            <button className='asset-card__paper-btn is-short' onClick={() => openTrade('SHORT')} disabled={btBlocked}>
                                 ▼ {t('card.short')}
                             </button>
                         </div>
