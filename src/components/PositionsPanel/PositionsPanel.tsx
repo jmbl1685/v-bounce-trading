@@ -326,14 +326,9 @@ const DemoRow = ({
     const [tp, setTp] = useState(p.tp != null ? String(p.tp) : '')
     const [sl, setSl] = useState(p.sl != null ? String(p.sl) : '')
 
-    const onTp = (v: string) => {
-        setTp(v)
-        setTpSl(p.id, parseNum(v), parseNum(sl))
-    }
-    const onSl = (v: string) => {
-        setSl(v)
-        setTpSl(p.id, parseNum(tp), parseNum(v))
-    }
+    // Commit only when the user clicks Set — typing must never arm the exit, or
+    // a partial value (e.g. "1") would look "hit" and auto-close the position.
+    const applyTpSl = () => setTpSl(p.id, parseNum(tp), parseNum(sl))
 
     // Estimated net PnL at the entered exit price (fees + funding included, just
     // like an actual close) so the figure matches what the position would book.
@@ -371,14 +366,17 @@ const DemoRow = ({
             <div className='positions-panel__tpsl'>
                 <label>
                     <span>{t('pt.tp')}</span>
-                    <input type='number' step='any' value={tp} placeholder='—' onChange={(e) => onTp(e.target.value)} />
+                    <input type='number' step='any' value={tp} placeholder='—' onChange={(e) => setTp(e.target.value)} />
                 </label>
                 <label>
                     <span>{t('pt.sl')}</span>
-                    <input type='number' step='any' value={sl} placeholder='—' onChange={(e) => onSl(e.target.value)} />
+                    <input type='number' step='any' value={sl} placeholder='—' onChange={(e) => setSl(e.target.value)} />
                 </label>
                 <Est pnl={tpPnl} margin={p.margin} />
                 <Est pnl={slPnl} margin={p.margin} />
+                <button className='positions-panel__tpsl-set' onClick={applyTpSl}>
+                    {t('pt.set')}
+                </button>
             </div>
         </div>
     )
