@@ -231,6 +231,19 @@
         word-break: break-word;
     }
 
+    &__warn {
+        margin: $space-3 0 0;
+        padding: 10px 12px;
+        border-radius: $radius-md;
+        background: color-mix(in srgb, var(--wait) 12%, var(--surface-2));
+        border: 1px solid color-mix(in srgb, var(--wait) 38%, var(--border));
+        color: var(--wait);
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.45;
+        text-align: left;
+    }
+
     // ---- footer buttons -------------------------------------------------------
     &__foot {
         display: flex;

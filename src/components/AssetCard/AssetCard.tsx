@@ -373,6 +373,15 @@ export const AssetCard = ({ symbol, interval, onRemove }: AssetCardProps) => {
                     testnet={credentials.testnet}
                     status={order.status}
                     error={order.error}
+                    warning={
+                        btVerdict?.kind === 'fail'
+                            ? t('order.btWarn', {
+                                  r: btVerdict.r.toFixed(1),
+                                  win: Math.round(btVerdict.win),
+                                  pf: btVerdict.pf.toFixed(2)
+                              })
+                            : undefined
+                    }
                     onConfirm={confirmOrder}
                     onClose={() => setOrder(null)}
                 />

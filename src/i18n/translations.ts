@@ -117,6 +117,7 @@ export const translations: Record<Lang, Dict> = {
         'order.done': 'Done',
         'order.close': 'Close',
         'order.retry': 'Try again',
+        'order.btWarn': 'Backtest is negative here ({r}R · {win}% win · PF {pf}) — historically a losing setup on this pair.',
         // Result banners
         'toast.openedTitle': 'Order opened',
         'toast.openedMsg': '{side} {sym} · {qty} @ market · {lev}×',
@@ -371,6 +372,7 @@ export const translations: Record<Lang, Dict> = {
         'order.done': 'Hecho',
         'order.close': 'Cerrar',
         'order.retry': 'Reintentar',
+        'order.btWarn': 'El backtest es negativo aquí ({r}R · {win}% aciertos · PF {pf}) — históricamente una operación perdedora en este par.',
         // Banners de resultado
         'toast.openedTitle': 'Orden abierta',
         'toast.openedMsg': '{side} {sym} · {qty} a mercado · {lev}×',

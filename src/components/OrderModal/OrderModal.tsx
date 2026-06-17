@@ -13,11 +13,13 @@ interface OrderModalProps {
     testnet: boolean
     status: OrderStatus
     error?: string
+    /** Last-chance reminder shown on the confirm step (e.g. a failing backtest). */
+    warning?: string
     onConfirm: () => void
     onClose: () => void
 }
 
-export const OrderModal = ({ side, symbol, plan, testnet, status, error, onConfirm, onClose }: OrderModalProps) => {
+export const OrderModal = ({ side, symbol, plan, testnet, status, error, warning, onConfirm, onClose }: OrderModalProps) => {
     const { t } = useI18n()
     const long = side === 'LONG'
     const sideWord = t(long ? 'card.long' : 'card.short')
@@ -125,6 +127,8 @@ export const OrderModal = ({ side, symbol, plan, testnet, status, error, onConfi
                         </div>
                     </dl>
                 )}
+
+                {status === 'confirm' && warning && <div className='om__warn'>⚠ {warning}</div>}
 
                 {status === 'error' && error && <pre className='om__error'>{error}</pre>}
 
