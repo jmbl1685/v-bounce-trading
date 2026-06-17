@@ -369,6 +369,38 @@
     }
 
     // ---- paper trade ---------------------------------------------------------
+    &__bt {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 11px;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1.4;
+        border-radius: $radius-sm;
+        border: 1px solid var(--border);
+
+        &-icon {
+            flex: none;
+            font-size: 13px;
+        }
+
+        &--pass {
+            color: var(--long);
+            background: var(--long-soft);
+            border-color: color-mix(in srgb, var(--long) 30%, var(--border));
+        }
+        &--fail {
+            color: var(--short);
+            background: var(--short-soft);
+            border-color: color-mix(in srgb, var(--short) 38%, var(--border));
+        }
+        &--low {
+            color: var(--text-faint);
+            background: var(--surface-2);
+        }
+    }
+
     &__paper {
         display: flex;
         flex-direction: column;

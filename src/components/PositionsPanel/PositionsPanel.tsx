@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useReducer, useRef, useState } from 'react'
 import {
     usePaperTrading,
     liqPrice,
@@ -16,7 +16,7 @@ import { useNow } from '../../hooks/useNow'
 import { useRealAccount } from '../../hooks/useRealAccount'
 import { getPrice } from '../../services/priceStore'
 import { closePosition as realClose, type Credentials, type RealPosition } from '../../services/binanceTrade'
-import { getLocalTpSl, setLocalTpSl, clearLocalTpSl, localTpSlSymbols } from '../../services/realTpSl'
+import { getLocalTpSl, setLocalTpSl, clearLocalTpSl, localTpSlSymbols, subscribeTpSl } from '../../services/realTpSl'
 import { AssetLogo } from '../AssetLogo/AssetLogo'
 import { CredentialsModal } from '../CredentialsModal/CredentialsModal'
 import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog'
@@ -60,7 +60,31 @@ export const PositionsPanel = ({ open, onClose }: PositionsPanelProps) => {
     useDemoAutoClose(real, positions, close, now)
 
     // ---- real: app-managed TP/SL (market-close when the level is hit) --------
-    useRealTpSlGuard(real ? credentials : null, liveAccount.positions, liveAccount.refresh)
+    // `loaded` (balance fetched at least once) gates pruning so a fresh load's
+    // momentarily-empty positions list can't wipe saved TP/SL.
+    useRealTpSlGuard(real ? credentials : null, liveAccount.positions, liveAccount.refresh, liveAccount.balance !== null)
+
+    // Re-render when stored TP/SL changes so the close-guard below stays current.
+    const [, bumpTpsl] = useReducer((x: number) => x + 1, 0)
+    useEffect(() => subscribeTpSl(bumpTpsl), [])
+
+    // Warn before leaving while a real position has an armed (browser-monitored)
+    // TP/SL — closing the tab would silently disarm it.
+    const tpslArmed =
+        real &&
+        liveAccount.positions.some((p) => {
+            const { tp, sl } = getLocalTpSl(p.symbol)
+            return tp !== null || sl !== null
+        })
+    useEffect(() => {
+        if (!tpslArmed) return
+        const onBeforeUnload = (e: BeforeUnloadEvent) => {
+            e.preventDefault()
+            e.returnValue = ''
+        }
+        window.addEventListener('beforeunload', onBeforeUnload)
+        return () => window.removeEventListener('beforeunload', onBeforeUnload)
+    }, [tpslArmed])
 
     let upnl = 0
     let usedMargin = 0
@@ -507,14 +531,19 @@ const DemoRow = ({
  * hit (the native conditional-order endpoint is rejected on some accounts).
  * Also prunes stored levels for positions that are no longer open.
  */
-const useRealTpSlGuard = (creds: Credentials | null, positions: RealPosition[], refresh: () => void) => {
+const useRealTpSlGuard = (creds: Credentials | null, positions: RealPosition[], refresh: () => void, loaded: boolean) => {
     const closing = useRef<Set<string>>(new Set())
 
     useEffect(() => {
         if (!creds) return
 
-        const open = new Set(positions.map((p) => p.symbol))
-        for (const sym of localTpSlSymbols()) if (!open.has(sym)) clearLocalTpSl(sym)
+        // Prune stored levels for closed positions — but ONLY once the account has
+        // actually loaded. On a fresh page load `positions` is briefly empty, and
+        // pruning then would wipe the TP/SL the user saved before refreshing.
+        if (loaded) {
+            const open = new Set(positions.map((p) => p.symbol))
+            for (const sym of localTpSlSymbols()) if (!open.has(sym)) clearLocalTpSl(sym)
+        }
 
         for (const pos of positions) {
             const { tp, sl } = getLocalTpSl(pos.symbol)
@@ -535,7 +564,7 @@ const useRealTpSlGuard = (creds: Credentials | null, positions: RealPosition[], 
                     })
             }
         }
-    }, [positions, creds, refresh])
+    }, [positions, creds, refresh, loaded])
 }
 
 const RealView = ({

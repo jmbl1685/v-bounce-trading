@@ -10,6 +10,7 @@ import { useToast } from '../../context/ToastContext'
 import { setPrice } from '../../services/priceStore'
 import { planOrder, openPosition as openRealPosition, type OrderPlan } from '../../services/binanceTrade'
 import { OrderModal, type OrderStatus } from '../OrderModal/OrderModal'
+import { runBacktest } from '../../indicators/backtest'
 import { SignalBadge } from '../SignalBadge/SignalBadge'
 import { StatusTag } from '../StatusTag/StatusTag'
 import { AssetLogo } from '../AssetLogo/AssetLogo'
@@ -68,6 +69,30 @@ export const AssetCard = ({ symbol, interval, onRemove }: AssetCardProps) => {
 
     const kind = signal?.kind ?? 'WAIT'
     const direction = priceChangePct > 0 ? 'up' : priceChangePct < 0 ? 'down' : 'flat'
+
+    // Background backtest of this strategy on this symbol/timeframe so a signal on
+    // a historically losing pair gets flagged. Deferred off the render path;
+    // recomputes only when a new bar closes or the tuning params change.
+    const lastBarTime = candles.length ? candles[candles.length - 1].openTime : 0
+    const paramsSig = JSON.stringify(params)
+    const [backtest, setBacktest] = useState<ReturnType<typeof runBacktest> | null>(null)
+    useEffect(() => {
+        if (candles.length <= 80) {
+            setBacktest(null)
+            return
+        }
+        const id = window.setTimeout(() => setBacktest(runBacktest(candles, interval, params)), 0)
+        return () => window.clearTimeout(id)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lastBarTime, interval, paramsSig])
+
+    const btVerdict = !backtest
+        ? null
+        : backtest.total < 6
+          ? ({ kind: 'low', n: backtest.total } as const)
+          : backtest.totalR > 0 && backtest.profitFactor >= 1
+            ? ({ kind: 'pass', r: backtest.totalR, win: backtest.winRate, pf: backtest.profitFactor } as const)
+            : ({ kind: 'fail', r: backtest.totalR, win: backtest.winRate, pf: backtest.profitFactor } as const)
 
     // Feed the live price to the shared store so the positions panel can mark PnL.
     useEffect(() => {
@@ -285,6 +310,29 @@ export const AssetCard = ({ symbol, interval, onRemove }: AssetCardProps) => {
                                 </li>
                             ))}
                         </ul>
+                    )}
+
+                    {btVerdict && (
+                        <div className={`asset-card__bt asset-card__bt--${btVerdict.kind}`}>
+                            <span className='asset-card__bt-icon'>
+                                {btVerdict.kind === 'fail' ? '⚠' : btVerdict.kind === 'pass' ? '✓' : '📉'}
+                            </span>
+                            <span>
+                                {btVerdict.kind === 'low'
+                                    ? t('card.btLow', { n: btVerdict.n })
+                                    : btVerdict.kind === 'pass'
+                                      ? t('card.btPass', {
+                                            r: `+${btVerdict.r.toFixed(1)}`,
+                                            win: Math.round(btVerdict.win),
+                                            pf: btVerdict.pf === Infinity ? '∞' : btVerdict.pf.toFixed(2)
+                                        })
+                                      : t('card.btFail', {
+                                            r: btVerdict.r.toFixed(1),
+                                            win: Math.round(btVerdict.win),
+                                            pf: btVerdict.pf.toFixed(2)
+                                        })}
+                            </span>
+                        </div>
                     )}
 
                     <div className={`asset-card__paper ${realMode ? 'is-real' : ''}`}>
