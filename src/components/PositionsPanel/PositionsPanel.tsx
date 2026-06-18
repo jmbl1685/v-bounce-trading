@@ -19,9 +19,11 @@ import { getPrice } from '../../services/priceStore'
 import { closePosition as realClose, type Credentials, type RealPosition } from '../../services/binanceTrade'
 import { getLocalTpSl, setLocalTpSl, clearLocalTpSl, localTpSlSymbols, subscribeTpSl } from '../../services/realTpSl'
 import { getPositionMeta, clearPositionMeta, positionMetaSymbols } from '../../services/realPositionMeta'
+import { recordRealClose, getRealHistory, clearRealHistory, subscribeRealHistory } from '../../services/realHistory'
 import { AssetLogo } from '../AssetLogo/AssetLogo'
 import { CredentialsModal } from '../CredentialsModal/CredentialsModal'
 import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog'
+import { PnlHistoryModal } from '../PnlHistoryModal/PnlHistoryModal'
 import { formatPrice, formatUsd, formatOpenedAt, formatAgo } from '../../utils/format'
 import './PositionsPanel.scss'
 
@@ -60,6 +62,7 @@ export const PositionsPanel = ({ open, onClose }: PositionsPanelProps) => {
     const now = useNow(800)
     const [showHistory, setShowHistory] = useState(false)
     const [showKeys, setShowKeys] = useState(false)
+    const [showPnl, setShowPnl] = useState(false)
     const [tpslMode, setTpslMode] = useState<TpSlMode>(() => (localStorage.getItem('v-bounce-tpsl-mode') === 'usdt' ? 'usdt' : 'price'))
     const [bankroll, setBankroll] = useState(String(startBalance))
 
@@ -79,6 +82,10 @@ export const PositionsPanel = ({ open, onClose }: PositionsPanelProps) => {
     // Re-render when stored TP/SL changes so the close-guard below stays current.
     const [, bumpTpsl] = useReducer((x: number) => x + 1, 0)
     useEffect(() => subscribeTpSl(bumpTpsl), [])
+
+    // Local close-history for real positions (logged when the app closes one).
+    const [realHistory, setRealHistory] = useState(getRealHistory)
+    useEffect(() => subscribeRealHistory(() => setRealHistory(getRealHistory())), [])
 
     // Warn before leaving while a real position has an armed (browser-monitored)
     // TP/SL — closing the tab would silently disarm it.
@@ -288,11 +295,16 @@ export const PositionsPanel = ({ open, onClose }: PositionsPanelProps) => {
 
             <div className='positions-panel__list-head'>
                 <span>{t('pt.open')}</span>
-                {!real && (positions.length > 0 || account.realized !== 0 || closed.length > 0) && (
-                    <button className='positions-panel__reset' onClick={reset}>
-                        {t('pt.reset')}
+                <div className='positions-panel__list-actions'>
+                    <button className='positions-panel__pnlbtn' onClick={() => setShowPnl(true)}>
+                        📈 {t('pnlh.button')}
                     </button>
-                )}
+                    {!real && (positions.length > 0 || account.realized !== 0 || closed.length > 0) && (
+                        <button className='positions-panel__reset' onClick={reset}>
+                            {t('pt.reset')}
+                        </button>
+                    )}
+                </div>
             </div>
 
             {real ? (
@@ -341,7 +353,44 @@ export const PositionsPanel = ({ open, onClose }: PositionsPanelProps) => {
                 </div>
             )}
 
+            {real && realHistory.length > 0 && (
+                <div className='positions-panel__history'>
+                    <button className='positions-panel__history-head' onClick={() => setShowHistory((s) => !s)}>
+                        <span>{t('pt.history')} ({realHistory.length})</span>
+                        <span className='positions-panel__history-actions'>
+                            <span
+                                className='positions-panel__history-clear'
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    clearRealHistory()
+                                }}
+                            >
+                                {t('pt.reset')}
+                            </span>
+                            <span className={`positions-panel__chev ${showHistory ? 'is-open' : ''}`}>▾</span>
+                        </span>
+                    </button>
+                    {showHistory && (
+                        <div className='positions-panel__history-list'>
+                            {realHistory.map((c) => (
+                                <div key={c.id} className='positions-panel__closed'>
+                                    <AssetLogo symbol={c.base} size={18} />
+                                    <span className='positions-panel__closed-sym'>{c.base}</span>
+                                    <span className={`positions-panel__closed-side is-${c.side.toLowerCase()}`}>
+                                        {c.side} {c.leverage}x
+                                    </span>
+                                    {REASON[c.reason] && <span className={`positions-panel__closed-reason is-${c.reason}`}>{REASON[c.reason]}</span>}
+                                    {c.interval && <span className='positions-panel__closed-tf'>{c.interval}</span>}
+                                    <span className={`positions-panel__closed-pnl ${pnlCls(c.pnl)}`}>{m(c.pnl, true)}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
+
             {showKeys && <CredentialsModal onClose={() => setShowKeys(false)} />}
+            {showPnl && <PnlHistoryModal closed={real ? realHistory : closed} onClose={() => setShowPnl(false)} />}
         </aside>
     )
 }
@@ -610,8 +659,10 @@ const useRealTpSlGuard = (creds: Credentials | null, positions: RealPosition[], 
             const hitSl = sl !== null && (long ? price <= sl : price >= sl)
             if ((hitTp || hitSl) && !closing.current.has(pos.symbol)) {
                 closing.current.add(pos.symbol)
+                const reason = hitTp ? 'tp' : 'sl'
                 realClose(creds, pos)
                     .then(() => {
+                        recordRealClose(pos, reason)
                         clearLocalTpSl(pos.symbol)
                         clearPositionMeta(pos.symbol)
                     })
@@ -636,13 +687,28 @@ const RealView = ({
 }) => {
     const ccy = useDisplayCurrency()
     const m = (v: number, signed = false) => fmtMoney(v, ccy.conv, ccy.unit, signed)
+    // Balance = wallet balance (the original/deposited amount, static).
+    // Margin = balance + unrealized PnL — the real-time equity (moves with PnL).
+    const margin = account.balance === null ? null : account.balance + realUpnl
     return (
     <div className='positions-panel__account'>
-        <div className='positions-panel__equity'>
-            <span className='positions-panel__label'>{t('pt.balance')}</span>
-            <b>{account.balance === null ? '—' : `${m(account.balance)} ${ccy.unit}`}</b>
+        <div className='positions-panel__realtop'>
+            <div className='positions-panel__equity'>
+                <span className='positions-panel__label'>{t('pt.walletBal')}</span>
+                <b>{account.balance === null ? '—' : `${m(account.balance)} ${ccy.unit}`}</b>
+            </div>
+            <div className='positions-panel__equity'>
+                <span className='positions-panel__label'>{t('pt.equity')}</span>
+                <b className={margin === null ? '' : pnlCls(margin - (account.balance ?? 0))}>
+                    {margin === null ? '—' : `${m(margin)} ${ccy.unit}`}
+                </b>
+            </div>
         </div>
         <div className='positions-panel__account-grid'>
+            <div>
+                <span>{t('pt.available')}</span>
+                <b>{account.available === null ? '—' : m(account.available)}</b>
+            </div>
             <div>
                 <span>{t('pt.upnl')}</span>
                 <b className={pnlCls(realUpnl)}>{m(realUpnl, true)}</b>
@@ -650,10 +716,6 @@ const RealView = ({
             <div>
                 <span>{t('pt.open')}</span>
                 <b>{account.positions.length}</b>
-            </div>
-            <div>
-                <span>{t('pt.status')}</span>
-                <b className={account.error ? 'is-neg' : 'is-pos'}>{account.error ? '⚠' : '●'}</b>
             </div>
         </div>
     </div>
@@ -703,6 +765,7 @@ const RealRow = ({
         setBusy(true)
         try {
             await realClose(creds, pos)
+            recordRealClose(pos, 'manual')
             clearPositionMeta(pos.symbol)
             onAfter()
             pushToast({ variant: 'success', title: t('toast.closedTitle'), message: t('toast.closedMsg', { sym: pos.base }) })

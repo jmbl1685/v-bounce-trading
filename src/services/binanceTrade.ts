@@ -102,6 +102,27 @@ export const getUsdtBalance = async (c: Credentials): Promise<number> => {
     return usdt ? parseFloat(usdt.balance) : 0
 }
 
+export interface UsdtAccount {
+    /** Wallet balance — the deposited/realized amount (excludes unrealized PnL). */
+    balance: number
+    /** Available balance — what's free to open new positions. */
+    available: number
+}
+
+/** Read the USDT futures balance: wallet balance + available (free) margin. */
+export const getUsdtAccount = async (c: Credentials): Promise<UsdtAccount> => {
+    const balances: { asset: string; balance: string; availableBalance: string }[] = await signed(
+        c,
+        'GET',
+        '/fapi/v2/balance'
+    )
+    const usdt = balances.find((b) => b.asset === 'USDT')
+    return {
+        balance: usdt ? parseFloat(usdt.balance) : 0,
+        available: usdt ? parseFloat(usdt.availableBalance) : 0
+    }
+}
+
 // Position mode (one-way vs hedge) is account-wide; cache per key.
 const dualSideCache = new Map<string, boolean>()
 const getDualSide = async (c: Credentials): Promise<boolean> => {

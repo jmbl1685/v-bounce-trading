@@ -1,0 +1,235 @@
+@use '../../styles/variables' as *;
+
+.pnlh {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    place-items: center;
+    padding: $space-4;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(2px);
+
+    &__panel {
+        width: 100%;
+        max-width: 460px;
+        max-height: 90vh;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: $space-3;
+        padding: $space-4;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: $radius-lg;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+    }
+
+    &__head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: $space-3;
+
+        h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+        }
+        p {
+            margin: 2px 0 0;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+    }
+
+    &__views {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        button {
+            display: grid;
+            place-items: center;
+            width: 32px;
+            height: 32px;
+            font-size: 14px;
+            color: var(--text-dim);
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: $radius-sm;
+            transition: all 0.15s ease;
+
+            &.is-active {
+                color: var(--text);
+                background: var(--surface-3);
+                border-color: var(--border-strong);
+            }
+        }
+    }
+
+    &__close {
+        font-size: 13px;
+    }
+
+    &__total {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        &-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--text-faint);
+            font-weight: 600;
+        }
+        b {
+            font-family: $font-mono;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dim);
+
+            &.is-pos {
+                color: var(--long);
+            }
+            &.is-neg {
+                color: var(--short);
+            }
+        }
+    }
+
+    // ---- calendar ------------------------------------------------------------
+    &__monthnav {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: $space-3;
+        margin-bottom: $space-2;
+        font-family: $font-mono;
+        font-size: 14px;
+        font-weight: 600;
+
+        button {
+            width: 26px;
+            height: 26px;
+            font-size: 16px;
+            color: var(--text-dim);
+            background: none;
+            border: none;
+            border-radius: $radius-sm;
+
+            &:hover {
+                color: var(--text);
+                background: var(--surface-2);
+            }
+        }
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+    }
+
+    &__dow {
+        text-align: center;
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--text-faint);
+        padding-bottom: 2px;
+    }
+
+    &__blank {
+        aspect-ratio: 1;
+    }
+
+    &__day {
+        aspect-ratio: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        border-radius: $radius-sm;
+        background: var(--surface-2);
+        border: 1px solid transparent;
+
+        &-n {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        &-v {
+            font-family: $font-mono;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        &.is-empty {
+            background: none;
+            .pnlh__day-n {
+                color: var(--text-faint);
+                font-weight: 500;
+            }
+        }
+        &.is-pos {
+            background: var(--long-soft);
+            border-color: color-mix(in srgb, var(--long) 30%, transparent);
+            .pnlh__day-v {
+                color: var(--long);
+            }
+        }
+        &.is-neg {
+            background: var(--short-soft);
+            border-color: color-mix(in srgb, var(--short) 30%, transparent);
+            .pnlh__day-v {
+                color: var(--short);
+            }
+        }
+        &.is-zero .pnlh__day-v {
+            color: var(--text-faint);
+        }
+    }
+
+    // ---- chart ---------------------------------------------------------------
+    &__chartwrap {
+        position: relative;
+        padding-left: 44px;
+    }
+
+    &__chart {
+        width: 100%;
+        height: 180px;
+    }
+
+    &__chart-empty {
+        height: 180px;
+        display: grid;
+        place-items: center;
+        color: var(--text-faint);
+        font-size: 13px;
+    }
+
+    &__chart-y {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 180px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        font-family: $font-mono;
+        font-size: 11px;
+        color: var(--text-faint);
+    }
+
+    &__chart-x {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 4px;
+        font-family: $font-mono;
+        font-size: 11px;
+        color: var(--text-faint);
+    }
+}

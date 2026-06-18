@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Credentials, RealPosition } from '../services/binanceTrade'
-import { getUsdtBalance, getPositions } from '../services/binanceTrade'
+import { getUsdtAccount, getPositions } from '../services/binanceTrade'
 
 interface RealAccount {
     balance: number | null
+    available: number | null
     positions: RealPosition[]
     error: string | null
     loading: boolean
@@ -18,6 +19,7 @@ const POLL_HIDDEN = 20000
 /** Poll the live Binance futures account (balance + positions) while active. */
 export const useRealAccount = (active: boolean, creds: Credentials | null): RealAccount => {
     const [balance, setBalance] = useState<number | null>(null)
+    const [available, setAvailable] = useState<number | null>(null)
     const [positions, setPositions] = useState<RealPosition[]>([])
     const [error, setError] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
@@ -26,8 +28,9 @@ export const useRealAccount = (active: boolean, creds: Credentials | null): Real
         if (!active || !creds) return
         setLoading(true)
         try {
-            const [b, p] = await Promise.all([getUsdtBalance(creds), getPositions(creds)])
-            setBalance(b)
+            const [b, p] = await Promise.all([getUsdtAccount(creds), getPositions(creds)])
+            setBalance(b.balance)
+            setAvailable(b.available)
             setPositions(p)
             setError(null)
         } catch (e) {
@@ -40,6 +43,7 @@ export const useRealAccount = (active: boolean, creds: Credentials | null): Real
     useEffect(() => {
         if (!active || !creds) {
             setBalance(null)
+            setAvailable(null)
             setPositions([])
             return
         }
@@ -69,5 +73,5 @@ export const useRealAccount = (active: boolean, creds: Credentials | null): Real
         }
     }, [active, creds, refresh])
 
-    return { balance, positions, error, loading, refresh }
+    return { balance, available, positions, error, loading, refresh }
 }

@@ -173,6 +173,16 @@
         }
     }
 
+    &__realtop {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: $space-3;
+
+        .positions-panel__equity b {
+            font-size: 18px;
+        }
+    }
+
     &__bankroll {
         display: flex;
         align-items: center;
@@ -501,6 +511,28 @@
         }
     }
 
+    &__list-actions {
+        display: flex;
+        align-items: center;
+        gap: $space-3;
+    }
+
+    &__pnlbtn {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-dim);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 3px 10px;
+        transition: all 0.15s ease;
+
+        &:hover {
+            color: var(--text);
+            border-color: var(--border-strong);
+        }
+    }
+
     &__reset {
         font-size: 11px;
         color: var(--text-dim);
@@ -787,6 +819,21 @@
         color: var(--text-faint);
     }
 
+    &__history-actions {
+        display: flex;
+        align-items: center;
+        gap: $space-3;
+    }
+
+    &__history-clear {
+        color: var(--text-faint);
+        transition: color 0.15s ease;
+
+        &:hover {
+            color: var(--short);
+        }
+    }
+
     &__chev {
         transition: transform 0.2s ease;
         &.is-open {
@@ -848,6 +895,16 @@
             color: var(--wait);
             background: var(--wait-soft);
         }
+    }
+
+    &__closed-tf {
+        font-family: $font-mono;
+        font-size: 9px;
+        font-weight: 700;
+        padding: 1px 5px;
+        border-radius: 999px;
+        color: var(--accent);
+        background: var(--accent-soft);
     }
 
     &__closed-pnl {
