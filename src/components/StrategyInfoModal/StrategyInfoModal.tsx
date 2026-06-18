@@ -9,6 +9,7 @@ import { SupertrendSample } from '../SupertrendSample/SupertrendSample'
 import { EmaPullbackSample } from '../EmaPullbackSample/EmaPullbackSample'
 import { DonchianSample } from '../DonchianSample/DonchianSample'
 import { SmcSample } from '../SmcSample/SmcSample'
+import { StochasticSample } from '../StochasticSample/StochasticSample'
 import './StrategyInfoModal.scss'
 
 interface StrategyInfoModalProps {
@@ -23,7 +24,8 @@ const SAMPLE: Record<StrategyKind, () => JSX.Element> = {
     supertrend: SupertrendSample,
     emapullback: EmaPullbackSample,
     donchian: DonchianSample,
-    smc: SmcSample
+    smc: SmcSample,
+    stochastic: StochasticSample
 }
 
 export const StrategyInfoModal = ({ id, onClose }: StrategyInfoModalProps) => {

@@ -9,6 +9,7 @@ export type StrategyKind =
     | 'emapullback'
     | 'donchian'
     | 'smc'
+    | 'stochastic'
 
 /**
  * What a strategy returns to the signal builder — the raw call plus reasons.

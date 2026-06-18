@@ -16,7 +16,8 @@ export const STRATEGIES: StrategyMeta[] = [
     { id: 'supertrend', available: true, bullets: 5 },
     { id: 'emapullback', available: true, bullets: 5 },
     { id: 'donchian', available: true, bullets: 5 },
-    { id: 'smc', available: true, bullets: 5 }
+    { id: 'smc', available: true, bullets: 5 },
+    { id: 'stochastic', available: true, bullets: 5 }
 ]
 
 const KEY = 'v-bounce-active-strategy'

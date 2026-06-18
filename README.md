@@ -1,6 +1,6 @@
-# ⚡ V‑Bounce — Crypto Futures Signal Dashboard
+# ⚡ Multi‑Strategy — Crypto Futures Signal Dashboard
 
-Real‑time **crypto futures signal dashboard** that spots **RSI + price “V‑bounce” reversals** on live Binance data — with backtesting, paper trading, and real order execution. Built with **React + TypeScript + Vite**.
+Real‑time **crypto futures signal dashboard** with **8 switchable trading strategies** on live Binance data — each with backtesting, paper trading, and real order execution. Built with **React + TypeScript + Vite**.
 
 <div align="center">
 
@@ -18,29 +18,34 @@ Real‑time **crypto futures signal dashboard** that spots **RSI + price “V‑
 
 ## ✨ Features
 
-- 📈 **Live V‑Bounce signals** — RSI + price reversal detection streamed over the Binance WebSocket (with spot fallback when futures is geo‑blocked).
-- 🧠 **Real indicators** — EMA, RSI, MACD, ATR computed client‑side; V / inverted‑V shape detection with a trend‑power “fake” filter and a capitulation override.
-- 🔬 **Backtesting & auto‑optimize** — replay the strategy bar‑by‑bar, see results in **R**, and auto‑tune parameters per symbol.
+- 🧩 **8 switchable strategies** — pick one from the header; every card recomputes its signals **live** (no reload), and the backtest verdict follows. Each strategy has an illustrated example and a plain‑language explainer.
+- 📡 **Live data over WebSocket** — prices and candles stream from the Binance WebSocket (with spot fallback when futures is geo‑blocked). No REST polling — a circuit breaker keeps it inside Binance IP limits.
+- 🧠 **Real indicators** — EMA, RSI, MACD, ATR, ADX/DMI, Bollinger/Keltner, Stochastic, structure & order‑block detection — all computed client‑side.
+- 🔬 **Backtesting & auto‑optimize** — replay the active strategy bar‑by‑bar, see results in **R**, and auto‑tune parameters per symbol.
 - 🧪 **Paper trading** — full simulator with margin, leverage, isolated/cross, taker/maker fees, funding, TP/SL and liquidation.
-- 💸 **Real trading** — place market orders, close positions, and arm TP/SL on your live Binance Futures account (testnet supported). Keys are stored locally in your browser and HMAC‑signed via the Web Crypto API.
-- 🔔 **Browser notifications** — background‑safe alerts on fresh, high‑confidence signals (Service Worker + Notifications API).
-- 🌗 **Light / dark themes** and **EN / ES** localization.
-- 🛡️ **Rate‑limit aware** — a circuit breaker backs off automatically to respect Binance IP limits.
+- 💸 **Real trading** — market orders, close, and app‑managed TP/SL on your live Binance Futures account (testnet supported). Balance / margin / available, plus a local **close‑history** and a **PnL‑history** calendar + chart.
+- 💱 **Display currency** — show account money in your local currency at a rate you set.
+- 🔔 **Browser notifications** — background‑safe alerts on fresh, high‑confidence signals.
+- 🌗 **Light / dark themes**, **EN / ES** localization, and a **technical‑mode** toggle for a minimal view.
 
 ---
 
-## 🎯 The strategy
+## 🎯 The strategies
 
-| Signal | Condition |
+Choose any from the **Strategy** selector in the header. Each returns a LONG / SHORT / WAIT signal with a dynamic stop/target plan, the same freshness + reward:risk guards, and a backtest verdict.
+
+| Strategy | Idea |
 | --- | --- |
-| **LONG (V‑bounce)** | RSI carves a **V out of oversold (≤ 30)** *and* price carves a **V below EMA10** — buyers stepping in after sellers exhaust. |
-| **SHORT (inverted‑V)** | The mirror — RSI peaks out of **overbought (≥ 70)** and price tops **above EMA10**. |
-| **MACD confirmation** | The MACD histogram carving its own V (momentum turning) adds confidence. |
-| **Fake filter** | If the trend still has power (EMA10 sloping steeply, a fresh lower‑low / higher‑high with no divergence, or a volume‑backed breakout) the setup is flagged a likely **continuation** and it waits. |
-| **Capitulation override** | A genuine volume climax + sharp RSI snap‑back rescues violent flushes that are real bottoms/tops. |
-| **Trade plan** | Entry at the reclaim, stop just beyond the V’s extreme, target at the next structure/EMA — every distance scaled by live volatility (**ATR**), with the resulting reward:risk shown. |
+| **V‑Bounce** | RSI + price carve a **V / inverted‑V** — an exhaustion reversal, with a trend‑power "fake" filter and capitulation override. |
+| **Bollinger Bands** | **Mean‑reversion** — a pierce beyond a ±2σ band that reclaims it, reverting toward the middle band (SMA 20). |
+| **TradingLatino** | Jaime Merino's method — **EMA55 backbone + DMI/ADX direction + LazyBear Squeeze Momentum** trigger. |
+| **Supertrend** | **ATR trend‑flip line** — take the fresh flip, trail the stop on the line. |
+| **EMA Pullback** | **Buy the dip in a trend** — stacked EMAs + a pullback to the 22‑EMA that resumes. |
+| **Donchian Breakout** | **Turtle** 20‑bar range breakout, trailing the opposite 10‑bar channel. |
+| **Smart Money (SMC)** | **Break of structure + order block** — trade the BOS while price holds its order block. |
+| **Stochastic** | **Pullback timing** — a %K/%D cross out of oversold/overbought, filtered by the trend. |
 
-A signal only fires when the **turn is confirmed** *and* the prevailing trend has lost its power.
+A signal only fires when the **trigger is fresh** *and* there is real reward left in the plan.
 
 ---
 
@@ -59,7 +64,7 @@ pnpm preview      # preview the production build
 
 ## 🔑 Real trading (optional)
 
-Open the **Positions** panel → switch to **Real** → add your Binance Futures **API key + secret** (a **testnet** toggle is available). Keys live only in your browser’s `localStorage` and are signed locally — they are never sent to any server but Binance.
+Open the **Positions** panel → switch to **Real** → add your Binance Futures **API key + secret** (a **testnet** toggle is available). Keys live only in your browser's `localStorage` and are HMAC‑signed locally via the Web Crypto API — they are never sent to any server but Binance.
 
 > [!NOTE]
 > Some accounts reject native conditional orders, so **TP/SL is app‑managed**: the levels are stored locally and the position is market‑closed when the price hits them — **active only while the tab is open**. This is surfaced clearly in the UI.
@@ -71,7 +76,7 @@ Open the **Positions** panel → switch to **Real** → add your Binance Futures
 Hosted on **Vercel** via its native Git integration — pushing to **`main`** ships to production.
 
 ```bash
-pnpm run deploy   # push main → production
+pnpm run deploy   # bump version, tag, push main → production
 ```
 
 ---

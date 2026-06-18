@@ -6,6 +6,7 @@ import { supertrendResult } from './supertrend'
 import { emaPullbackResult } from './emapullback'
 import { donchianResult } from './donchian'
 import { smcResult } from './smc'
+import { stochasticResult } from './stochastic'
 import { EMPTY_PLAN, planFromAnchor } from './plan'
 import { getActiveStrategy } from '../strategies/registry'
 import type { StrategyResult } from '../strategies/types'
@@ -46,6 +47,8 @@ const strategyResult = (ind: Indicators, candles: Candle[], params: StrategyPara
             return donchianResult(ind, candles, params)
         case 'smc':
             return smcResult(ind, candles, params)
+        case 'stochastic':
+            return stochasticResult(ind, candles, params)
         default:
             return vbounceResult(ind, candles, params)
     }
