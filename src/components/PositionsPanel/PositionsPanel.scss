@@ -34,7 +34,14 @@
         background: transparent;
         overflow: visible;
 
-        .positions-panel__head {
+        // The board is positions-only — all account/config controls live in the
+        // drawer, which stays open alongside it in the Positions tab.
+        .positions-panel__head,
+        .positions-panel__mode,
+        .positions-panel__note,
+        .positions-panel__account,
+        .positions-panel__currency,
+        .positions-panel__defaults {
             display: none;
         }
 

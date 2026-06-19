@@ -131,13 +131,13 @@ export const App = () => {
                 </footer>
             </div>
 
-            {view === 'markets' && <PositionsPanel open={panelOpen} onClose={() => setPanelOpen(false)} />}
+            <PositionsPanel open={panelOpen} onClose={() => setPanelOpen(false)} />
 
             <ToastHost />
 
             {showTutorial && <TutorialPage onClose={() => setShowTutorial(false)} />}
 
-            {view === 'markets' && !panelOpen && (
+            {!panelOpen && (
                 <button className='app__panel-toggle' onClick={() => setPanelOpen(true)}>
                     📋 {t('pt.toggle')}
                     {positions.length > 0 && <span className='app__panel-badge'>{positions.length}</span>}

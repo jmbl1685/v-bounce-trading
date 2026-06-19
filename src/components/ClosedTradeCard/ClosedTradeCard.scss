@@ -1,0 +1,115 @@
+@use '../../styles/variables' as *;
+
+.closed-card {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    padding: $space-3;
+    border-radius: $radius-md;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+
+    &__head {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    &__sym {
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+    &__side {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+
+        &.is-long {
+            color: var(--long);
+        }
+        &.is-short {
+            color: var(--short);
+        }
+    }
+
+    &__reason {
+        font-size: 9px;
+        font-weight: 700;
+        padding: 1px 5px;
+        border-radius: 999px;
+        background: var(--surface-3);
+        color: var(--text-dim);
+
+        &.is-liq {
+            color: var(--short);
+            background: var(--short-soft);
+        }
+        &.is-tp {
+            color: var(--long);
+            background: var(--long-soft);
+        }
+        &.is-sl {
+            color: var(--wait);
+            background: var(--wait-soft);
+        }
+    }
+
+    &__pnl {
+        margin-left: auto;
+        font-family: $font-mono;
+        font-weight: 700;
+        font-size: 13px;
+        color: var(--text-dim);
+
+        i {
+            margin-left: 4px;
+            font-style: normal;
+            font-size: 11px;
+            opacity: 0.85;
+        }
+
+        &.is-pos {
+            color: var(--long);
+        }
+        &.is-neg {
+            color: var(--short);
+        }
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 4px $space-3;
+        padding-top: $space-2;
+        border-top: 1px solid var(--border);
+    }
+
+    &__stat {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: $space-2;
+        min-width: 0;
+    }
+
+    &__stat-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-faint);
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    &__stat-val {
+        font-family: $font-mono;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text);
+        text-align: right;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}

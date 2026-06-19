@@ -21,6 +21,7 @@ import { getLocalTpSl, setLocalTpSl, clearLocalTpSl, localTpSlSymbols, subscribe
 import { getPositionMeta, clearPositionMeta, positionMetaSymbols } from '../../services/realPositionMeta'
 import { recordRealClose, getRealHistory, clearRealHistory, subscribeRealHistory } from '../../services/realHistory'
 import { AssetLogo } from '../AssetLogo/AssetLogo'
+import { ClosedTradeCard } from '../ClosedTradeCard/ClosedTradeCard'
 import { CredentialsModal } from '../CredentialsModal/CredentialsModal'
 import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog'
 import { PnlHistoryModal } from '../PnlHistoryModal/PnlHistoryModal'
@@ -36,7 +37,6 @@ interface PositionsPanelProps {
 }
 
 const LEVERAGES = [3, 5, 10, 20, 50]
-const REASON: Record<string, string> = { manual: '', tp: 'TP', sl: 'SL', liq: 'LIQ' }
 
 const usdt = (v: number) => `${v >= 0 ? '+' : ''}${formatUsd(v, 2)}`
 const pnlCls = (v: number) => (v > 0 ? 'is-pos' : v < 0 ? 'is-neg' : '')
@@ -75,13 +75,18 @@ export const PositionsPanel = ({ open, onClose, layout = 'drawer' }: PositionsPa
     }, [tpslMode])
     useEffect(() => setBankroll(String(startBalance)), [startBalance])
 
+    // The board is a presentation-only mirror shown alongside the drawer in the
+    // Positions tab; the drawer instance is the single live engine. Gate all
+    // side-effects off here so liq/TP/SL closes never fire twice.
+    const engine = !board
+
     // ---- demo (paper) auto-close on liq / TP / SL ---------------------------
-    useDemoAutoClose(real, positions, close, now)
+    useDemoAutoClose(engine, real, positions, close, now)
 
     // ---- real: app-managed TP/SL (market-close when the level is hit) --------
     // `loaded` (balance fetched at least once) gates pruning so a fresh load's
     // momentarily-empty positions list can't wipe saved TP/SL.
-    useRealTpSlGuard(real ? credentials : null, liveAccount.positions, liveAccount.refresh, liveAccount.balance !== null)
+    useRealTpSlGuard(engine && real ? credentials : null, liveAccount.positions, liveAccount.refresh, liveAccount.balance !== null)
 
     // Re-render when stored TP/SL changes so the close-guard below stays current.
     const [, bumpTpsl] = useReducer((x: number) => x + 1, 0)
@@ -94,6 +99,7 @@ export const PositionsPanel = ({ open, onClose, layout = 'drawer' }: PositionsPa
     // Warn before leaving while a real position has an armed (browser-monitored)
     // TP/SL — closing the tab would silently disarm it.
     const tpslArmed =
+        engine &&
         real &&
         liveAccount.positions.some((p) => {
             const { tp, sl } = getLocalTpSl(p.symbol)
@@ -353,13 +359,25 @@ export const PositionsPanel = ({ open, onClose, layout = 'drawer' }: PositionsPa
                     {showHistory && (
                         <div className='positions-panel__history-list'>
                             {closed.map((c) => (
-                                <div key={c.id} className='positions-panel__closed'>
-                                    <AssetLogo symbol={c.base} size={18} />
-                                    <span className='positions-panel__closed-sym'>{c.base}</span>
-                                    <span className={`positions-panel__closed-side is-${c.side.toLowerCase()}`}>{c.side}</span>
-                                    {REASON[c.reason] && <span className={`positions-panel__closed-reason is-${c.reason}`}>{REASON[c.reason]}</span>}
-                                    <span className={`positions-panel__closed-pnl ${pnlCls(c.pnl)}`}>{m(c.pnl, true)}</span>
-                                </div>
+                                <ClosedTradeCard
+                                    key={c.id}
+                                    trade={{
+                                        base: c.base,
+                                        side: c.side,
+                                        leverage: c.leverage,
+                                        reason: c.reason,
+                                        pnl: c.pnl,
+                                        roe: c.roe,
+                                        entryPrice: c.entryPrice,
+                                        exitPrice: c.exitPrice,
+                                        margin: c.margin,
+                                        decimals: c.decimals,
+                                        strategy: c.strategy,
+                                        interval: c.interval,
+                                        openedAt: c.openedAt,
+                                        closedAt: c.closedAt
+                                    }}
+                                />
                             ))}
                         </div>
                     )}
@@ -385,18 +403,29 @@ export const PositionsPanel = ({ open, onClose, layout = 'drawer' }: PositionsPa
                     </button>
                     {showHistory && (
                         <div className='positions-panel__history-list'>
-                            {realHistory.map((c) => (
-                                <div key={c.id} className='positions-panel__closed'>
-                                    <AssetLogo symbol={c.base} size={18} />
-                                    <span className='positions-panel__closed-sym'>{c.base}</span>
-                                    <span className={`positions-panel__closed-side is-${c.side.toLowerCase()}`}>
-                                        {c.side} {c.leverage}x
-                                    </span>
-                                    {REASON[c.reason] && <span className={`positions-panel__closed-reason is-${c.reason}`}>{REASON[c.reason]}</span>}
-                                    {c.interval && <span className='positions-panel__closed-tf'>{c.interval}</span>}
-                                    <span className={`positions-panel__closed-pnl ${pnlCls(c.pnl)}`}>{m(c.pnl, true)}</span>
-                                </div>
-                            ))}
+                            {realHistory.map((c) => {
+                                const margin = c.leverage > 0 ? (c.qty * c.entryPrice) / c.leverage : 0
+                                return (
+                                    <ClosedTradeCard
+                                        key={c.id}
+                                        trade={{
+                                            base: c.base,
+                                            side: c.side,
+                                            leverage: c.leverage,
+                                            reason: c.reason,
+                                            pnl: c.pnl,
+                                            roe: margin > 0 ? (c.pnl / margin) * 100 : 0,
+                                            entryPrice: c.entryPrice,
+                                            exitPrice: c.exitPrice,
+                                            margin,
+                                            strategy: c.strategy,
+                                            interval: c.interval,
+                                            openedAt: c.openedAt,
+                                            closedAt: c.closedAt
+                                        }}
+                                    />
+                                )
+                            })}
                         </div>
                     )}
                 </div>
@@ -411,13 +440,14 @@ export const PositionsPanel = ({ open, onClose, layout = 'drawer' }: PositionsPa
 // --- helpers ----------------------------------------------------------------
 
 const useDemoAutoClose = (
+    active: boolean,
     real: boolean,
     positions: Position[],
     close: (id: string, price: number, reason?: 'manual' | 'tp' | 'sl' | 'liq') => void,
     now: number
 ) => {
     useEffect(() => {
-        if (real) return
+        if (!active || real) return
         for (const p of positions) {
             const price = getPrice(p.symbol)
             if (price === undefined) continue
@@ -428,7 +458,7 @@ const useDemoAutoClose = (
             else if (p.sl !== null && ((long && price <= p.sl) || (!long && price >= p.sl))) close(p.id, p.sl, 'sl')
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [now, positions, real])
+    }, [now, positions, real, active])
 }
 
 interface DemoRowData {

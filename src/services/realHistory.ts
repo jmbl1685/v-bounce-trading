@@ -20,6 +20,8 @@ export interface RealClosed {
     reason: 'manual' | 'tp' | 'sl'
     interval: string | null
     closedAt: number
+    strategy?: string
+    openedAt?: number
 }
 
 const KEY = 'v-bounce-real-history'
@@ -47,6 +49,7 @@ export const clearRealHistory = (): void => write([])
 /** Log a just-closed real position. PnL/exit are taken at close time. */
 export const recordRealClose = (pos: RealPosition, reason: RealClosed['reason']): void => {
     const closedAt = Date.now()
+    const meta = getPositionMeta(pos.symbol)
     const rec: RealClosed = {
         id: `${pos.symbol}-${closedAt}`,
         symbol: pos.symbol,
@@ -58,8 +61,10 @@ export const recordRealClose = (pos: RealPosition, reason: RealClosed['reason'])
         qty: pos.qty,
         pnl: pos.pnl,
         reason,
-        interval: getPositionMeta(pos.symbol)?.interval ?? null,
-        closedAt
+        interval: meta?.interval ?? null,
+        closedAt,
+        strategy: meta?.strategy,
+        openedAt: meta?.openedAt
     }
     write([rec, ...read()].slice(0, CAP))
 }

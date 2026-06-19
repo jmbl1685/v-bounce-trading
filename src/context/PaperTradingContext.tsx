@@ -44,6 +44,13 @@ export interface ClosedTrade {
     reason: CloseReason
     closedAt: number
     strategy?: string
+    // Optional — present on trades closed since the detailed-history change;
+    // older persisted entries simply omit these and the card hides those rows.
+    entryPrice?: number
+    exitPrice?: number
+    decimals?: number
+    interval?: Interval
+    openedAt?: number
 }
 
 interface Account {
@@ -203,7 +210,12 @@ export const PaperTradingProvider = ({ children }: { children: ReactNode }) => {
                     roe,
                     reason,
                     closedAt: now,
-                    strategy: pos.strategy
+                    strategy: pos.strategy,
+                    entryPrice: pos.entryPrice,
+                    exitPrice: price,
+                    decimals: pos.decimals,
+                    interval: pos.interval,
+                    openedAt: pos.openedAt
                 },
                 ...c
             ].slice(0, 30)
